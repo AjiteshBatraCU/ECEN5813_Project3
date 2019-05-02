@@ -71,10 +71,10 @@ uint16_t largest = 0;
 void DMA0_IRQHandler(void) {
 	DMA0->DMA[0].DSR_BCR |= DMA_DSR_BCR_DONE_MASK;
 	DMA0->DMA[0].DCR &= !(DMA_DCR_EINT(1));	//interrupt
-#if DMA_PRINT == 1
-			PrintDMABuffer();
-#endif
+
+	PrintDMABuffer();
 	max_value();
+	log_calculation();
 	destReg_Flag = !destReg_Flag;
 	DMA0_Init();
 }

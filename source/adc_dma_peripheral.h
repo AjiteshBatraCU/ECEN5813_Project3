@@ -9,7 +9,9 @@
 #define ADC_DMA_PERIPHERAL_H_
 
 #define ADC_PRINT 0
-#define DMA_PRINT 0
+#define DMA_INIT_PRINT 0
+#define DMA_PRINT 1
+#define LOG_CALC 1
 
 #define DEMO_ADC16_BASE ADC0
 #define DEMO_ADC16_CHANNEL_GROUP 0U
@@ -24,5 +26,6 @@ void DMA0_Init();
 void LED_Init();
 void PrintDMABuffer(void);
 void max_value();
+void log_calculation();
 
 #endif /* ADC_DMA_PERIPHERAL_H_ */

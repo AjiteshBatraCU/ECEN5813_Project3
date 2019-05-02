@@ -25,6 +25,7 @@ extern uint32_t destAddr2[BUFF_LENGTH];
 extern uint16_t largest;
 
 void PrintDMABuffer(void) {
+#if DMA_PRINT == 1
 	/* Print destination buffer */
 	PRINTF("\r\n\r\nDMA peripheral to memory transfer finish.\r\n\r\n");
 	PRINTF("Destination Buffer:\r\n");
@@ -38,6 +39,7 @@ void PrintDMABuffer(void) {
 			PRINTF("%d. %d\t", i, destAddr2[i]);
 		}
 	}
+#endif
 }
 
 void DMA0_Init() {
@@ -59,7 +61,7 @@ void DMA0_Init() {
 	DMA0->DMA[0].DCR |= DMA_DCR_DSIZE(0); //size 32bits
 	DMA0->DMA[0].DCR |= DMA_DCR_SSIZE(0);
 
-#if DMA_PRINT == 1
+#if DMA_INIT_PRINT == 1
 	PRINTF("Destination Buffer @ Start:\r\n");
 	for (uint32_t i = 0; i < BUFF_LENGTH; i++)
 	{
@@ -124,9 +126,53 @@ void max_value() {
 	/*Print new maximum value or decay value*/
 	if (largest < current_largest) {
 		largest = current_largest;
-		printf("%d\t", current_largest);
+#if LOG_CALC == 0
+		printf("%d\t", largest);
+#endif
 	} else {
 		largest = DECAY_COEFFICIENT * (largest);
+#if LOG_CALC == 0
 		printf("%d\t", largest);
+#endif
 	}
+	log_calculation();
 }
+
+void log_calculation() {
+	struct log_lookup {
+		int adc_value;
+		int log_dBFS;
+	};
+
+	const struct log_lookup log_values[] = { { 992, -36 }, { 1985, -30 }, {
+			2978, -26 }, { 3971, -24 }, { 4964, -22 }, { 5957, -20 }, { 6950,
+			-19 }, { 7943, -18 }, { 8936, -17 }, { 9929, -16 }, { 10922, -15 },
+			{ 11915, -14 }, { 12908, -14 }, { 13901, -13 }, { 14894, -12 }, {
+					15887, -12 }, { 16880, -11 }, { 17873, -11 },
+			{ 18866, -10 }, { 19859, -10 }, { 20852, -9 }, { 21845, -9 }, {
+					22838, -9 }, { 23831, -8 }, { 24824, -8 }, { 25817, -8 }, {
+					26810, -7 }, { 27803, -7 }, { 28796, -7 }, { 29789, -6 }, {
+					30782, -6 }, { 31775, -6 }, { 32768, -6 }, { 33760, -5 }, {
+					34753, -5 }, { 35746, -5 }, { 36739, -5 }, { 37732, -4 }, {
+					38725, -4 }, { 39718, -4 }, { 40711, -4 }, { 41704, -3 }, {
+					42697, -3 }, { 43690, -3 }, { 44683, -3 }, { 45676, -3 }, {
+					46669, -2 }, { 47662, -2 }, { 48655, -2 }, { 49648, -2 }, {
+					50641, -2 }, { 51634, -2 }, { 52627, -1 }, { 53620, -1 }, {
+					54613, -1 }, { 55606, -1 }, { 56599, -1 }, { 57592, -1 }, {
+					58585, 0 }, { 59578, 0 }, { 60571, 0 }, { 61564, 0 }, {
+					62557, 0 }, { 63550, 0 }, { 64543, 0 }, { 65536, 0 } };
+#if LOG_CALC == 1
+	if (largest == 0)
+	printf("%d : undefined", largest);
+	else
+	for (int i = 0; i < 66; i++)
+	{
+		if (largest < log_values[i].adc_value)
+		{
+			printf("%largest : %ddBFS\n", largest, log_values[i].log_dBFS);
+			break;
+		}
+	}
+#endif
+}
+
